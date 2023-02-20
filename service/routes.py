@@ -61,7 +61,20 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
+@app.route("/accounts", methods=["Get"])
+def list_accounts():
+    """
+    list  Accounts
+    This endpoint list Account based the data in the body that is posted
+    """
+    app.logger.info("Request to list Accounts")
+    check_content_type("application/json")
+    accounts = Account.all()
+    account_list = [account.serialize() for account in accounts]
+    app.logger.info("Returning [%s] accounts", len(account_list))
+    return jsonify(account_list), status.HTTP_200_OK
+
+
 
 
     ######################################################################
@@ -86,7 +99,22 @@ def get_accounts(account_id):
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
+
+@app.route("/accounts/<int:account_id>", methods=["put"])
+def update_an_accounts(account_id):
+    """
+    updates an Account
+
+    This endpoint will update an Account based the account_id that is requested
+    """
+    app.logger.info("Request to update an Account with id: %s", account_id)
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND)
+    account.deserialize(request.get_json())
+    account.update()
+    account.serialize()
+    return {}, status.HTTP_200_OK
 
 
 ######################################################################
