@@ -149,3 +149,31 @@ class TestAccountService(TestCase):
         self.assertEqual(resp.status_code,status.HTTP_204_NO_CONTENT)
         data = resp.get_json()
         self.assertIsNone(data)
+
+    def test_update_an_account(self):
+        """ it should update an account by id"""
+        account=self._create_accounts(1)[0]
+        account.name="ansh"
+        resp = self.client.put(
+            f"{BASE_URL}/{account.id}",
+            json=account.serialize(),
+            content_type="application/json"
+        )
+        resp = self.client.get(
+            f"{BASE_URL}/{account.id}", content_type="application/json"
+        )
+        jason=resp.get_json()
+        self.assertEqual(account.name,"ansh")
+        self.assertEqual(jason["name"],"ansh")
+        self.assertEqual(resp.status_code,status.HTTP_200_OK)
+
+
+    def test_list_accounts(self):
+        """ it should list all accounts"""
+        account=self._create_accounts(4)
+        resp=self.client.get(
+            BASE_URL,content_type="application/json"
+        )
+        self.assertEqual(resp.status_code,status.HTTP_200_OK)
+        data=resp.get_json()
+        self.assertEqual(len(data),4)
